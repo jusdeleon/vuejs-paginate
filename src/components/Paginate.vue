@@ -1,5 +1,8 @@
 <template>
   <ul :class="containerClass" v-if="!noLiSurround">
+    <li :class="[firstClass, { disabled: firstPageSelected() }]">
+      <a @click="firstPage()" @keyup.enter="firstPage()" :class="firstLinkClass" tabindex="0"><slot name="firstContent">{{ firstText }}</slot></a>
+    </li>
     <li :class="[prevClass, { disabled: firstPageSelected() }]">
       <a @click="prevPage()" @keyup.enter="prevPage()" :class="prevLinkClass" tabindex="0"><slot name="prevContent">{{ prevText }}</slot></a>
     </li>
@@ -10,9 +13,13 @@
     <li :class="[nextClass, { disabled: lastPageSelected() }]">
       <a @click="nextPage()" @keyup.enter="nextPage()" :class="nextLinkClass" tabindex="0"><slot name="nextContent">{{ nextText }}</slot></a>
     </li>
+    <li :class="[lastClass, { disabled: lastPageSelected() }]">
+      <a @click="lastPage()" @keyup.enter="lastPage()" :class="lastLinkClass" tabindex="0"><slot name="lastContent">{{ lastText }}</slot></a>
+    </li>
   </ul>
 
   <div :class="containerClass" v-else>
+    <a @click="firstPage()" @keyup.enter="firstPage()" :class="[firstLinkClass, { disabled: firstPageSelected() }]" tabindex="0"><slot name="firstContent">{{ firstText }}</slot></a>
     <a @click="prevPage()" @keyup.enter="prevPage()" :class="[prevLinkClass, { disabled: firstPageSelected() }]" tabindex="0"><slot name="prevContent">{{ prevText }}</slot></a>
     <template v-for="page in pages">
       <a v-if="page.disabled" :class="[pageLinkClass, page.selected ? activeClass : '', { disabled: page.disabled }]" tabindex="0">{{ page.content }}</a>
@@ -21,6 +28,7 @@
       </a>
     </template>
     <a @click="nextPage()" @keyup.enter="nextPage()" :class="[nextLinkClass, { disabled: lastPageSelected() }]" tabindex="0"><slot name="nextContent">{{ nextText }}</slot></a>
+    <a @click="lastPage()" @keyup.enter="lastPage()" :class="[firstLinkClass, { disabled: lastPageSelected() }]" tabindex="0"><slot name="lastContent">{{ lastText }}</slot></a>
   </div>
 </template>
 
@@ -50,6 +58,10 @@ export default {
       type: Number,
       default: 1
     },
+    firstText: {
+      type: String,
+      default: 'First'
+    },
     prevText: {
       type: String,
       default: 'Prev'
@@ -58,6 +70,10 @@ export default {
       type: String,
       default: 'Next'
     },
+    lastText: {
+      type: String,
+      default: 'Last'
+    },
     containerClass: {
       type: String
     },
@@ -65,6 +81,12 @@ export default {
       type: String
     },
     pageLinkClass: {
+      type: String
+    },
+    firstClass: {
+      type: String
+    },
+    firstLinkClass: {
       type: String
     },
     prevClass: {
@@ -77,6 +99,12 @@ export default {
       type: String
     },
     nextLinkClass: {
+      type: String
+    },
+    lastClass: {
+      type: String
+    },
+    lastLinkClass: {
       type: String
     },
     activeClass: {
@@ -188,6 +216,11 @@ export default {
 
       this.clickHandler(this.selected + 1)
     },
+    firstPage() {
+      this.selected = 0
+
+      this.clickHandler(this.selected)
+    },
     prevPage() {
       if (this.selected <= 0) return
 
@@ -201,6 +234,11 @@ export default {
       this.selected++
 
       this.clickHandler(this.selected + 1)
+    },
+    lastPage() {
+      this.selected = this.pageCount - 1
+
+      this.clickHandler(this.pageCount)
     },
     firstPageSelected() {
       return this.selected === 0
